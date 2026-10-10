@@ -3,3 +3,4 @@ frames/
 frames-split/
 source-frames/
 source-frames-raw/
+__pycache__/
