@@ -553,7 +553,7 @@ Object.assign(SCENE_FNS, {
         }
       }
       label('TAROT', 540, 470, 120, YELLOW, { k: easeBack(seg(t, 36.98, 37.18)) * (1 - seg(t, 38.7, 38.85)), rot: -3 });
-      label('HAR PARISTHITI', 540, 1450, 80, '#ffffff', { k: easeBack(seg(t, 38.08, 38.28)) * (1 - seg(t, 38.75, 38.85)), rot: 2 });
+      label('HAR PARISTHITI', 540, 1300, 80, '#ffffff', { k: easeBack(seg(t, 38.08, 38.28)) * (1 - seg(t, 38.75, 38.85)), rot: 2 });
       if (t > 40.3) label('LIFE IMPROVE!', 540, 470, 104, YELLOW, { k: easeBack(seg(t, 40.4, 40.6)), rot: -3, swash: PAL.violet });
     },
   },
