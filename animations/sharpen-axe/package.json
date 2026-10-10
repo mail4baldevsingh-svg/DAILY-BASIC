@@ -1,0 +1,20 @@
+{
+  "name": "sharpen-axe",
+  "version": "1.0.0",
+  "description": "Hand-drawn p5.brush animation for the \"Sharpen Your Axe\" reel",
+  "scripts": {
+    "bake": "node tools/bake.mjs",
+    "preview": "node tools/preview.mjs",
+    "render": "node tools/render.mjs frames 4",
+    "encode": "tools/encode.sh frames"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@fontsource/kalam": "^5.3.0",
+    "@fontsource/luckiest-guy": "^5.3.0",
+    "p5": "^2.3.4",
+    "p5.brush": "^2.2.3",
+    "playwright-core": "1.56"
+  },
+  "private": true
+}
