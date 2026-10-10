@@ -32,7 +32,8 @@ node tools/preview.mjs out 1.6 9.5 # stills + contact sheet for chosen timestamp
 npm run render                     # all 1114 frames into ./frames (≈30 min on 4 cores)
 tools/encode.sh frames <original-video.mp4> out/sharpen-your-axe.mp4
 
-# split layout: cut the original into panel frames first
+# split layout: cut the original into panel frames first; this also removes the source's
+# Instagram watermark and logo outro (needs python3 with opencv-contrib-python-headless + numpy)
 tools/extract-source.sh <original-video.mp4>
 LAYOUT=split node tools/render.mjs frames-split 4
 tools/encode.sh frames-split <original-video.mp4> out/sharpen-your-axe-split.mp4
