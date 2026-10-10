@@ -574,7 +574,7 @@ Object.assign(SCENE_FNS, {
       for (let i = 0; i < 5; i++) sparkle(540 + [-260, 250, 220, -200, 40][i], 760 + [-180, -120, 200, 230, -300][i], 30 * (0.6 + 0.4 * Math.sin(t * 6 + i)) * k, i % 2 ? '#ffffff' : PAL.marigold, 2720 + i);
     },
     overlay(ctx, t) {
-      const k1 = easeBack(seg(t, 42.72, 42.92)), k2 = easeBack(seg(t, 42.9, 43.1)), k3 = easeOut(seg(t, 43.5, 43.8)), k4 = easeOut(seg(t, 44.0, 44.3));
+      const k1 = easeBack(seg(t, 42.72, 42.92)), k2 = easeBack(seg(t, 42.9, 43.1)), k3 = easeOut(seg(t, 43.5, 43.8));
       const pop = (txt, y, size, col, k, rotA) => {
         if (k <= 0) return;
         ctx.save(); ctx.translate(W / 2, y); ctx.rotate(deg(rotA)); ctx.scale(k, k);
@@ -588,11 +588,6 @@ Object.assign(SCENE_FNS, {
       if (k3 > 0) {
         ctx.save(); ctx.globalAlpha = k3;
         outlined(ctx, 'Comment mein batao', W / 2, 1410, 56, '#ffffff', { family: FONT_HAND, lw: 9 });
-        ctx.restore();
-      }
-      if (k4 > 0) {
-        ctx.save(); ctx.globalAlpha = k4 * 0.9;
-        outlined(ctx, 'audio: @jagmohansachdeva', W / 2, 1490, 34, '#ffffff', { family: FONT_HAND, lw: 6, shadow: false });
         ctx.restore();
       }
     },

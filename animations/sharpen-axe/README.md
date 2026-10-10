@@ -29,5 +29,5 @@ tools/encode.sh frames <original-video.mp4> out/sharpen-your-axe.mp4
 
 ## Credits
 
-- Voice-over audio: @jagmohansachdeva (used as the soundtrack; credited on the end card).
+- Voice-over audio: @jagmohansachdeva (the video is made for him).
 - p5.brush © Alejandro Campos Uribe, MIT. Fonts: Luckiest Guy and Kalam (SIL OFL, see `fonts/`).
