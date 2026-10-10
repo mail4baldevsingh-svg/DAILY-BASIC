@@ -4,6 +4,12 @@ A 46-second vertical (1080×1920, 24 fps) animation of the "sharpen the axe" sto
 with [p5.js](https://p5js.org) + [p5.brush](https://github.com/acamposuribe/p5.brush) and timed
 word-for-word to the original Hinglish voice-over.
 
+Two layouts:
+
+- **full** — the animation fills the frame (`out/sharpen-your-axe.mp4`)
+- **split** — the animation plays in the top 1200 px, the original video in an inked frame in the
+  bottom 720 px, with the captions riding the torn-paper seam (`out/sharpen-your-axe-split.mp4`)
+
 ## How it is made
 
 - **Watercolour plates** (`js/bake.js`): forest, office, night sky, etc. are painted once with real
@@ -25,7 +31,14 @@ npm run bake                       # repaint the watercolour plates (≈3 min)
 node tools/preview.mjs out 1.6 9.5 # stills + contact sheet for chosen timestamps
 npm run render                     # all 1114 frames into ./frames (≈30 min on 4 cores)
 tools/encode.sh frames <original-video.mp4> out/sharpen-your-axe.mp4
+
+# split layout: cut the original into panel frames first
+tools/extract-source.sh <original-video.mp4>
+LAYOUT=split node tools/render.mjs frames-split 4
+tools/encode.sh frames-split <original-video.mp4> out/sharpen-your-axe-split.mp4
 ```
+
+Preview either layout with `LAYOUT=split node tools/preview.mjs <outdir> <t> ...`.
 
 ## Credits
 

@@ -1,9 +1,10 @@
-// Render all frames in parallel browsers: node tools/render.mjs <framesDir> [workers] [from] [to]
+// Render all frames in parallel browsers: [LAYOUT=split] node tools/render.mjs <framesDir> [workers] [from] [to]
 import fs from 'node:fs';
 import path from 'node:path';
 import { serve, openPage, dataUrlToBuffer } from './browser.mjs';
 
 const [outDir, nWorkers = '3', fromArg, toArg] = process.argv.slice(2);
+const query = process.env.LAYOUT ? `?layout=${process.env.LAYOUT}` : '';
 const FPS = 24, DURATION = 46.4;
 const total = Math.round(FPS * DURATION);
 const from = fromArg ? Number(fromArg) : 0, to = toArg ? Number(toArg) : total - 1;
@@ -17,7 +18,7 @@ const { srv, port } = await serve();
 let next = 0, done = 0;
 const t0 = Date.now();
 async function worker(id) {
-  const { browser, page } = await openPage(port, 'index.html');
+  const { browser, page } = await openPage(port, 'index.html', { query });
   while (next < todo.length) {
     const i = todo[next++];
     const url = await page.evaluate((n) => window.renderFrame(n, 0.94), i);

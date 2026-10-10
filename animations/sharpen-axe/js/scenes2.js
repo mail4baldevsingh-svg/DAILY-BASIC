@@ -213,8 +213,9 @@ Object.assign(SCENE_FNS, {
         layer(() => shape(starPts(rr(R, 120, 960), rr(R, 520, 1200), 70 * p + 20, 14 * p + 6, 8), '#ffffff', { w: 0.8, seed: 1160 + i }));
       });
       const kb = easeBack(seg(t, 12.84, 13.02));
-      bubble(540, 560, 800, 230, 300, 700, kb, 1170);
-      if (kb > 0) label('BHAI AISA KAISE?!', 540, 560, 74, INK, { k: kb, stroke: '#ffffff', lw: 8, shadow: false, rot: -2 });
+      const by = SPLIT ? 625 : 560;
+      bubble(540, by, 800, 230, 300, by + 140, kb, 1170);
+      if (kb > 0) label('BHAI AISA KAISE?!', 540, by, 74, INK, { k: kb, stroke: '#ffffff', lw: 8, shadow: false, rot: -2 });
       questionMarks(560, 720, t, 13.3, 1180);
     },
     screen(t) { for (const f of FLASHES) { const d = t - f; if (d >= 0 && d < 0.07) tintScreen('#ffffff', 140 * (1 - d / 0.07), BLEND); } },
@@ -583,11 +584,12 @@ Object.assign(SCENE_FNS, {
         outlined(ctx, txt, 0, 0, size, col);
         ctx.restore();
       };
-      pop('AAJ APNI', 1150, 112, '#ffffff', k1, -3);
-      pop('KULHAADI TEZ KI?', 1290, 120, YELLOW, k2, 2);
+      const ys = SPLIT ? [800, 930, 1045] : [1150, 1290, 1410];
+      pop('AAJ APNI', ys[0], 112, '#ffffff', k1, -3);
+      pop('KULHAADI TEZ KI?', ys[1], 120, YELLOW, k2, 2);
       if (k3 > 0) {
         ctx.save(); ctx.globalAlpha = k3;
-        outlined(ctx, 'Comment mein batao', W / 2, 1410, 56, '#ffffff', { family: FONT_HAND, lw: 9 });
+        outlined(ctx, 'Comment mein batao', W / 2, ys[2], 56, '#ffffff', { family: FONT_HAND, lw: 9 });
         ctx.restore();
       }
     },

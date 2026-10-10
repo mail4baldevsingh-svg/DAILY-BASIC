@@ -34,7 +34,7 @@ function draw() {
   push();
   translate(-W / 2, -H / 2);
   push();
-  translate(W / 2 + CAM.sx, H / 2 + CAM.sy);
+  translate(W / 2 + CAM.sx, PANEL_CY + CAM.sy);
   rotate(CAM.r);
   scale(CAM.z);
   translate(-CAM.x, -CAM.y);
@@ -68,10 +68,24 @@ window.renderFrame = async (i, quality = 0.92) => {
   OCTX.globalCompositeOperation = 'source-over';
   SEED = boilIndex(t);
   drawLabels(OCTX, CAM);
+  if (SPLIT) {
+    drawVideoPanel(OCTX, await loadVideoFrame(i));
+    drawSeam(OCTX);
+  }
   const S = SCENE_FNS[sceneAt(t).id];
   if (S.overlay) S.overlay(OCTX, t, t - sceneAt(t).t0);
   drawHeadline(OCTX, t);
   drawCaptions(OCTX, t);
   return OUT.toDataURL('image/jpeg', quality);
 };
-window.renderTime = (t, q) => window.renderFrame(t * FPS, q);
+window.renderTime = (t, q) => window.renderFrame(Math.round(t * FPS), q);
+
+// Original video frames (pre-cropped to the panel by ffmpeg, see README)
+function loadVideoFrame(i) {
+  return new Promise((resolve) => {
+    const im = new Image();
+    im.onload = () => resolve(im);
+    im.onerror = () => resolve(null);
+    im.src = `source-frames/v_${String(i).padStart(5, '0')}.jpg`;
+  });
+}

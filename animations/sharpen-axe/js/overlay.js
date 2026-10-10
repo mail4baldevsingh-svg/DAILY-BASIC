@@ -2,7 +2,7 @@
 
 const FONT_BIG = 'LuckiestGuy';
 const FONT_HAND = 'Kalam';
-const CAP_Y = 1505;
+const CAP_Y = SPLIT ? SPLIT_Y : 1505;
 const YELLOW = '#ffd23f';
 
 function makeGrain() {
@@ -73,7 +73,7 @@ function swash(ctx, x0, x1, y, h, col, seed, k = 1) {
 function drawCaptions(ctx, t) {
   const line = CAPTION_LINES.find((l) => t >= l.t0 - 0.02 && t < l.t1);
   if (!line) return;
-  const size = 104, gap = 34;
+  const size = SPLIT ? 98 : 104, gap = 34;
   const words = line.words.map((w) => w[0].toUpperCase());
   let total = words.reduce((n, w) => n + measureW(ctx, w, size), 0) + gap * (words.length - 1);
   const scaleFit = Math.min(1, 960 / total);
@@ -112,11 +112,11 @@ function drawHeadline(ctx, t) {
     // the hook: lands word by word in the first second
     const lines = [['10', 'GHANTE', 'KAAM...'], ['FIR', 'BHI', 'TARAKKI', 'NAHI?']];
     const cols = ['#ffffff', YELLOW];
-    const sizes = [104, 96];
+    const sizes = SPLIT ? [94, 88] : [104, 96];
     let n = 0;
     const out = seg(t, HOOK_END, HOOK_END + 0.3);
     lines.forEach((ws, li) => {
-      const y = 330 + li * 122;
+      const y = (SPLIT ? 215 : 330) + li * (SPLIT ? 110 : 122);
       const tw = ws.reduce((a, w) => a + measureW(ctx, w, sizes[li]), 0) + 22 * (ws.length - 1);
       const fit = Math.min(1, 980 / tw);
       let x = W / 2 - (tw * fit) / 2;
@@ -141,8 +141,8 @@ function drawHeadline(ctx, t) {
   const k = easeBack(seg(t, HOOK_END + 0.1, HOOK_END + 0.4));
   if (k <= 0) return;
   ctx.save();
-  ctx.translate(W / 2, 300);
-  ctx.scale(k, k);
+  ctx.translate(W / 2, SPLIT ? 195 : 300);
+  ctx.scale(k * (SPLIT ? 0.8 : 1), k * (SPLIT ? 0.8 : 1));
   const w1 = measureW(ctx, 'SHARPEN YOUR ', 70), w2 = measureW(ctx, 'AXE', 70);
   const x0 = -(w1 + w2) / 2;
   swash(ctx, x0 + w1 - 14, x0 + w1 + w2 + 14, -30, 64, '#d64933', 5);
@@ -156,14 +156,19 @@ function drawHeadline(ctx, t) {
 function label(text, x, y, size, col, opts = {}) { LABELS.push({ text, x, y, size, col, ...opts }); }
 function drawLabels(ctx, cam) {
   ctx.save();
-  ctx.translate(W / 2 + cam.sx, H / 2 + cam.sy);
+  ctx.translate(W / 2 + cam.sx, PANEL_CY + cam.sy);
   ctx.rotate(deg(cam.r));
   ctx.scale(cam.z, cam.z);
   ctx.translate(-cam.x, -cam.y);
   for (const L of LABELS) {
     if ((L.k ?? 1) <= 0) continue;
     ctx.save();
-    ctx.translate(L.x, L.y);
+    let ly = L.y;
+    if (SPLIT) {
+      const screenY = (L.y - cam.y) * cam.z + PANEL_CY + cam.sy, minY = 255 + L.size * 0.3;
+      if (screenY < minY) ly += (minY - screenY) / cam.z;
+    }
+    ctx.translate(L.x, ly);
     ctx.rotate(deg(L.rot ?? 0));
     const sc = (L.k ?? 1) * (L.scale ?? 1);
     ctx.scale(sc, sc);
@@ -174,5 +179,64 @@ function drawLabels(ctx, cam) {
     outlined(ctx, L.text, 0, 0, L.size, L.col, { family: L.family, alpha: L.alpha ?? 1, lw: L.lw, stroke: L.stroke, shadow: L.shadow });
     ctx.restore();
   }
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- split layout
+const VID = { x: 108, y: SPLIT_Y, w: 864, h: 720 };
+function wobblyPath(ctx, pts, seed, amt) {
+  const R = rng(seed);
+  ctx.beginPath();
+  pts.forEach((p, i) => {
+    const q = pts[(i + 1) % pts.length];
+    for (let k = 0; k < 6; k++) {
+      const x = mix(p[0], q[0], k / 6) + rr(R, -amt, amt), y = mix(p[1], q[1], k / 6) + rr(R, -amt, amt);
+      if (i === 0 && k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  });
+  ctx.closePath();
+}
+function drawVideoPanel(ctx, img) {
+  ctx.save();
+  ctx.fillStyle = PAPER;
+  ctx.fillRect(0, SPLIT_Y, W, H - SPLIT_Y);
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.drawImage(GRAIN, 0, SPLIT_Y, W, H - SPLIT_Y, 0, SPLIT_Y, W, H - SPLIT_Y);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = 'rgba(42,32,24,0.35)';
+  ctx.fillRect(VID.x + 12, VID.y + 16, VID.w, VID.h);
+  if (img) ctx.drawImage(img, VID.x, VID.y, VID.w, VID.h);
+  ctx.strokeStyle = INK; ctx.lineWidth = 7; ctx.lineJoin = 'round';
+  wobblyPath(ctx, [[VID.x, VID.y], [VID.x + VID.w, VID.y], [VID.x + VID.w, H + 30], [VID.x, H + 30]], SEED * 31 + 5, 2.2);
+  ctx.stroke();
+  // little doodles in the paper margins
+  ctx.fillStyle = PAL.marigold; ctx.strokeStyle = INK; ctx.lineWidth = 3;
+  for (const [x, y, r] of [[54, 1330, 18], [1026, 1460, 16], [52, 1640, 12], [1030, 1270, 11]]) {
+    const R = rng(SEED * 11 + x);
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) { const a = deg(-90 + i * 45), rad = i % 2 ? r * 0.32 : r; ctx.lineTo(x + Math.cos(a) * rad + rr(R, -1, 1), y + Math.sin(a) * rad + rr(R, -1, 1)); }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+}
+// Torn paper edge where the animation page overlaps the video
+function drawSeam(ctx) {
+  const R = rng(SEED * 17 + 9);
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(-10, SPLIT_Y - 6);
+  ctx.lineTo(W + 10, SPLIT_Y - 6);
+  const edge = [];
+  for (let x = W + 10; x >= -10; x -= 22) edge.push([x, SPLIT_Y + 10 + rr(R, -7, 7)]);
+  for (const [x, y] of edge) ctx.lineTo(x, y);
+  ctx.closePath();
+  ctx.fillStyle = '#ece1c9';
+  ctx.shadowColor = 'rgba(42,32,24,0.4)'; ctx.shadowOffsetY = 6; ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.beginPath();
+  edge.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+  ctx.stroke();
   ctx.restore();
 }

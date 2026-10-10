@@ -2,6 +2,11 @@
 // Native p5 calls draw flat paint; p5.brush draws the ink on top.
 
 const W = 1080, H = 1920;
+// Layout: 'full' = animation fills the frame; 'split' = animation on top, original video below
+const LAYOUT = (typeof location !== 'undefined' && new URLSearchParams(location.search).get('layout')) || 'full';
+const SPLIT = LAYOUT === 'split';
+const SPLIT_Y = 1200;                       // seam between animation (top) and video (bottom)
+const PANEL_CY = SPLIT ? 660 : H / 2;       // where the scene camera centre lands on screen
 const FPS = 24;          // output frame rate
 const BOIL_FPS = 12;     // hand-drawn "on twos": linework re-rolls 12x per second
 const DURATION = 46.4;

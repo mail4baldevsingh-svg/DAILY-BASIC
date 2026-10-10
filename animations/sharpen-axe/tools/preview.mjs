@@ -6,9 +6,10 @@ import { execFileSync } from 'node:child_process';
 import { serve, openPage, dataUrlToBuffer } from './browser.mjs';
 
 const [outDir, ...times] = process.argv.slice(2);
+const query = process.env.LAYOUT ? `?layout=${process.env.LAYOUT}` : '';
 fs.mkdirSync(outDir, { recursive: true });
 const { srv, port } = await serve();
-const { browser, page } = await openPage(port, 'index.html');
+const { browser, page } = await openPage(port, 'index.html', { query });
 const files = [];
 for (const ts of times) {
   const t0 = Date.now();
